@@ -1,5 +1,6 @@
 // 74HC595 test
 // Resistor network Fritzing part: https://forum.fritzing.org/t/resistor-array/2079/45
+// Delays assume ATtiny85 8 MHz internal clock (CKSEL=0010 / CKDIV8=1 / lfuse=0xE2)
 
 #define SH_CLK PIN_PB0
 #define ST_CLK PIN_PB1

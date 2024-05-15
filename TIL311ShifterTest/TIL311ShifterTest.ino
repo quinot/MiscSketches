@@ -1,5 +1,6 @@
 // TIL311+74HC595 test
 // TIL311 Fritzing part: https://forum.fritzing.org/t/til311-hexadecimal-display-with-logic/1023
+// Delays assume ATtiny85 8 MHz internal clock (CKSEL=0010 / CKDIV8=1 / lfuse=0xE2)
 
 #define SH_CLK PIN_PB0
 #define ST_CLK PIN_PB1
