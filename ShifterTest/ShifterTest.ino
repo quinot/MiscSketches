@@ -1,4 +1,5 @@
 // 74HC595 test
+// Resistor network Fritzing part: https://forum.fritzing.org/t/resistor-array/2079/45
 
 #define SH_CLK PIN_PB0
 #define ST_CLK PIN_PB1
