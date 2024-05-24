@@ -17,19 +17,24 @@
 #define PIN_Qi    8 // FF1: 14   FF2: 2
 #define PIN_Q     9 // FF1: 15   FF2: 1
 
-bool checkOutputs(int q, int qi, char *msg) {
+bool checkOutputs(int q, int qi, bool quiet, char *fail_msg) {
   int actual_q = digitalRead(PIN_Q);
   int actual_qi = digitalRead(PIN_Qi);
-  
-  if (q == actual_q && qi == actual_qi)
+  bool pass = (q == actual_q && qi == actual_qi);
+
+  if (!(pass && quiet)) {
+    printf("expect Q=%d Qi=%d ", q, qi);
+  }
+
+  if (pass)
     return true;
 
-  printf("!! %s: expected Q=%d Qi=%d, got Q=%d Qi=%d !! ", msg, q, qi, actual_q, actual_qi);
+  printf("!! %s: got Q=%d Qi=%d !! ", fail_msg, actual_q, actual_qi);
   return false;
 }
 
-bool checkState(int q, char *msg) {
-  return checkOutputs(q, !q, msg);
+bool checkState(int q, bool quiet, char *fail_msg) {
+  return checkOutputs(q, !q, quiet, fail_msg);
 }
 
 void pulse(int pin) {
@@ -49,7 +54,7 @@ void pulseClock() {
   digitalWrite(PIN_CLOCK, LOW);
   delayMicroseconds(1);
 
-  checkOutputs(q, qi, "Unexpected change on clock falling edge");
+  checkOutputs(q, qi, true, "Unexpected change on clock falling edge");
 }
 
 void setState(int q) {
@@ -83,16 +88,16 @@ bool reportResult(bool pass) {
   return pass;
 }
 bool testTransition(int j, int k, int q, int expected_q) {
-  printf("J=%d K=%d Q=%d ", j, k, q, expected_q);
+  printf("J=%d K=%d Q=%d -> ", j, k, q);
   setState(q);
-  if (!checkState(q, "Failed to check pre-state"))
+  if (!checkState(q, true, "Failed to check pre-state"))
     return false;
 
   digitalWrite(PIN_J, j);
   digitalWrite(PIN_K, k);
   pulseClock();
   
-  return reportResult(checkState(expected_q, "Unexpected check after clock"));
+  return reportResult(checkState(expected_q, false, "Unexpected state after clock"));
 }
 
 void runTests() {
@@ -118,23 +123,23 @@ void runTests() {
 
   // Rule 6: SET
 
-  printf("SET ");
+  printf("SET -> ");
   setState(1);
-  reportResult(checkState(1, "Failed to SET state"));
+  reportResult(checkState(1, false, "Failed to SET state"));
 
   // Rule 7: RESET
 
-  printf("RESET ");
+  printf("RESET -> ");
   setState(0);
-  reportResult(checkState(0, "Failed to RESET state"));
+  reportResult(checkState(0, false, "Failed to RESET state"));
 
   // Rule 8: SET+RESET
 
-  printf("SET+RESET ");
+  printf("SET+RESET -> ");
   digitalWrite(PIN_SET, HIGH);
   digitalWrite(PIN_RESET, HIGH);
   delayMicroseconds(1);
-  reportResult(checkOutputs(1, 1, "Unexpected state on SET+RESET"));
+  reportResult(checkOutputs(1, 1, false, "Unexpected state on SET+RESET"));
 
   // Cleanup
 
