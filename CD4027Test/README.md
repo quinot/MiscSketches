@@ -8,3 +8,8 @@ Rule numbers refer to the lines in the truth table:
 
 Connections (for first flip-flop):
 ![breadboard schematic](CD4027Test_bb.png?raw=true "breadboard schematic")
+
+Serial terminal connection:
+```
+tio -b 115200 -m ONLCRNL,INLCRNL /dev/ttyACM0
+```
